@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.KFlix" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="android:windowBackground">@color/kflix_bg</item>
+        <item name="android:statusBarColor">@color/black</item>
+        <item name="android:navigationBarColor">@color/black</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="colorPrimary">@color/kflix_accent</item>
+        <item name="colorSecondary">@color/kflix_focus_ring</item>
+    </style>
+
+    <style name="Theme.KFlix.Dialog" parent="Theme.MaterialComponents.Dialog.Alert">
+        <item name="android:windowBackground">@color/kflix_card_bg</item>
+        <item name="android:textColorPrimary">@color/kflix_text_primary</item>
+        <item name="colorPrimary">@color/kflix_accent</item>
+    </style>
+</resources>

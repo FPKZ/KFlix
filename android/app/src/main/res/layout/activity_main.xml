@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mainRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    android:keepScreenOn="true">
+
+    <!-- WebView Principal com aceleração de hardware -->
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:scrollbars="none" />
+
+    <!-- Container para Fullscreen Video do WebChromeClient -->
+    <FrameLayout
+        android:id="@+id/customViewContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        android:visibility="gone" />
+
+    <!-- Indicador de carregamento inicial -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="center"
+        android:indeterminateTint="@color/kflix_accent"
+        android:visibility="visible" />
+
+    <!-- Tela de Recuperação / Erro de Conexão -->
+    <LinearLayout
+        android:id="@+id/errorContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/kflix_bg"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="32dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="68dp"
+            android:src="@drawable/tv_banner"
+            android:layout_marginBottom="24dp"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:id="@+id/tvErrorTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/error_connection_title"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/tvErrorDesc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/error_connection_desc"
+            android:textColor="@color/kflix_text_secondary"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:maxWidth="600dp"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:id="@+id/tvMenuHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/press_menu_hint"
+            android:textColor="@color/kflix_focus_ring"
+            android:textSize="14sp"
+            android:layout_marginBottom="28dp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnRetry"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/btn_tv_secondary_selector"
+                android:text="@string/btn_retry"
+                android:textColor="@color/white"
+                android:focusable="true"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp" />
+
+            <Button
+                android:id="@+id/btnConfigServer"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:background="@drawable/btn_tv_selector"
+                android:text="@string/btn_configure"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:focusable="true"
+                android:paddingStart="28dp"
+                android:paddingEnd="28dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>

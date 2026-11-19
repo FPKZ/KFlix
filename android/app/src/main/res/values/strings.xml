@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">KFlix</string>
+    <string name="server_setup_title">Configuração do Servidor Jellyfin</string>
+    <string name="server_url_hint">Ex: http://192.168.1.50:8096 ou https://jellyfin.meudominio.com</string>
+    <string name="server_url_label">URL do Servidor:</string>
+    <string name="btn_save">Salvar</string>
+    <string name="btn_cancel">Cancelar</string>
+    <string name="btn_retry">Tentar Novamente</string>
+    <string name="btn_configure">Configurar Servidor</string>
+    <string name="invalid_url_message">Por favor, insira uma URL válida.</string>
+    <string name="error_connection_title">Não foi possível conectar</string>
+    <string name="error_connection_desc">Verifique se o servidor Jellyfin está ligado e se a TV está na mesma rede.</string>
+    <string name="press_menu_hint">Pressione a tecla MENU para alterar o servidor.</string>
+</resources>

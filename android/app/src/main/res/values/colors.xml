@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="kflix_bg">#FF0A0A0C</color>
+    <color name="kflix_card_bg">#FF16161E</color>
+    <color name="kflix_accent">#FF00A4DC</color>
+    <color name="kflix_focus_ring">#FF00E5FF</color>
+    <color name="kflix_text_primary">#FFFFFFFF</color>
+    <color name="kflix_text_secondary">#FFAAAAAA</color>
+    <color name="kflix_error">#FFFF5252</color>
+</resources>

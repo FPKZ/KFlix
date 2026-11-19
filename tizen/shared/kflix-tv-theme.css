@@ -1,0 +1,128 @@
+/**
+ * KFlix TV Theme (kflix-tv-theme.css)
+ * Otimizações de interface e foco de 10 pés para Smart TVs (Fire TV, Tizen, Android TV).
+ * Destaque de alto contraste, animações suaves e eliminação de barras de rolagem.
+ */
+
+/* 1. Ocultação global de barras de rolagem (Desktop/Mouse) */
+html,
+body,
+* {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE e Edge */
+}
+
+::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, Android WebView, WebKit */
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* 2. Destaque de Foco Harmonizado com o Jellyfin (10-foot UI Focus) */
+/* Harmoniza com o estilo sutil nativo do Jellyfin, evitando foco duplo ou pulos visuais */
+.kflix-focused,
+.card.focusItem,
+.card:focus-visible,
+.listItem.focusItem,
+.listItem:focus-visible {
+  outline: 2px solid #00a4dc !important; /* Azul Jellyfin neon elegante */
+  outline-offset: 2px !important;
+  box-shadow: 0 0 12px rgba(0, 164, 220, 0.6), 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+  transform: scale(1.03) !important; /* Escala suave e contida para não deslocar elementos vizinhos */
+  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out, outline 0.12s ease-out !important;
+  z-index: 50 !important;
+  position: relative !important;
+}
+
+button.kflix-focused,
+button:focus-visible,
+.emby-button.kflix-focused,
+.emby-button:focus-visible,
+.paper-icon-button-light.kflix-focused,
+.paper-icon-button-light:focus-visible {
+  background-color: rgba(0, 164, 220, 0.25) !important;
+  outline: 2px solid #00a4dc !important;
+  outline-offset: 1px !important;
+}
+
+/* 3. Desativação de efeitos de hover com mouse em Smart TV para evitar foco fantasma */
+@media (hover: hover) {
+  /* Em TV D-Pad puro, hover deve ser secundário ao foco real */
+}
+
+/* 4. Ajustes de tipografia e legibilidade para visualização de 10 pés */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+/* 5. Desobstrução e correção de toque/clique no banner do Jellyfin (Touch & Click Fix) */
+.cardOverlayContainer {
+  pointer-events: none !important;
+}
+
+.cardOverlayContainer button,
+.cardOverlayContainer a,
+.cardOverlayButton,
+.cardOverlayFab {
+  pointer-events: auto !important;
+}
+
+.card,
+.cardBox,
+.cardScalable,
+.cardPadder,
+.cardImageContainer,
+.cardContent {
+  cursor: pointer !important;
+  -webkit-tap-highlight-color: rgba(0, 164, 220, 0.2) !important;
+}
+
+/* 6. Modo Mouse Virtual (Cursor TV) */
+#kflix-virtual-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 22px;
+  height: 22px;
+  background-color: rgba(0, 164, 220, 0.95);
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999999;
+  box-shadow: 0 0 14px rgba(0, 164, 220, 0.9), 0 2px 8px rgba(0, 0, 0, 0.6);
+  transform: translate(-50%, -50%);
+  transition: transform 0.04s ease-out, background-color 0.1s ease-out;
+  display: none;
+}
+
+#kflix-virtual-cursor.clicking {
+  transform: translate(-50%, -50%) scale(0.8);
+  background-color: #ffffff;
+}
+
+#kflix-mode-toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(16, 20, 24, 0.92);
+  color: #00a4dc;
+  border: 1px solid #00a4dc;
+  border-radius: 24px;
+  padding: 10px 24px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  z-index: 9999999;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease-in-out;
+}
+
+#kflix-mode-toast.visible {
+  opacity: 1;
+}

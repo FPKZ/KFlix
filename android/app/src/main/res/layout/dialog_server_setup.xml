@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@color/kflix_card_bg">
+
+    <TextView
+        android:id="@+id/dialogTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/server_setup_title"
+        android:textColor="@color/kflix_text_primary"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/dialogDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/server_url_hint"
+        android:textColor="@color/kflix_text_secondary"
+        android:textSize="14sp"
+        android:layout_marginBottom="16dp" />
+
+    <EditText
+        android:id="@+id/etServerUrl"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:background="@drawable/edit_text_tv_bg"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:textColor="@color/white"
+        android:textColorHint="#88FFFFFF"
+        android:hint="http://192.168.1.50:8096"
+        android:inputType="textUri|textNoSuggestions"
+        android:imeOptions="actionDone"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/tvErrorMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/invalid_url_message"
+        android:textColor="@color/kflix_error"
+        android:textSize="14sp"
+        android:visibility="gone"
+        android:layout_marginBottom="16dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="8dp">
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/btn_tv_secondary_selector"
+            android:text="@string/btn_cancel"
+            android:textColor="@color/white"
+            android:focusable="true"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp" />
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:background="@drawable/btn_tv_selector"
+            android:text="@string/btn_save"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:focusable="true"
+            android:paddingStart="28dp"
+            android:paddingEnd="28dp" />
+    </LinearLayout>
+
+</LinearLayout>

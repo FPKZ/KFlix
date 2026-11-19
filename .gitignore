@@ -1,0 +1,26 @@
+# Build artifacts & caches
+**/build/
+**/.gradle/
+**/.kotlin/
+**/local.properties
+**/*.iml
+**/.idea/
+**/captures/
+**/.externalNativeBuild/
+**/.cxx/
+
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS & Editor temp files
+.DS_Store
+Thumbs.db
+*.swp
+*.bak
+*~
+
+# Distribution files (keep release binaries, ignore heavy debug APK)
+dist/kflix-tv-debug.apk

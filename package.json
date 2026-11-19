@@ -1,0 +1,19 @@
+{
+  "name": "kflix",
+  "version": "1.0.0",
+  "description": "KFlix - Jellyfin TV Shell para Fire TV e Smart TVs",
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test shared/engine/__tests__/*.test.js tizen/__tests__/*.test.js",
+    "test:tizen": "node --test tizen/__tests__/*.test.js"
+  },
+  "keywords": [
+    "jellyfin",
+    "smart-tv",
+    "fire-tv",
+    "tizen",
+    "spatnav"
+  ],
+  "author": "KFlix Team",
+  "license": "MIT"
+}

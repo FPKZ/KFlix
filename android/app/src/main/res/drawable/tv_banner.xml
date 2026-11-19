@@ -1,0 +1,31 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp"
+    android:height="180dp"
+    android:viewportWidth="320"
+    android:viewportHeight="180">
+    <!-- Fundo Escuro -->
+    <path
+        android:fillColor="#FF0D1117"
+        android:pathData="M0,0h320v180h-320z" />
+    
+    <!-- Elementos Decorativos de Fundo -->
+    <path
+        android:fillColor="#1A00A4DC"
+        android:pathData="M0,0 L160,0 L240,180 L0,180 Z" />
+
+    <!-- Ícone Play estilizado -->
+    <path
+        android:fillColor="#FF00A4DC"
+        android:pathData="M110,60 L110,120 L160,90 Z" />
+
+    <!-- Texto / Letras "KFLIX" estilizadas com path -->
+    <!-- Letra K -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M175,65 L183,65 L183,85 L198,65 L208,65 L192,87 L209,115 L198,115 L183,91 L183,115 L175,115 Z" />
+
+    <!-- Linha de Destaque Ciano Inferior -->
+    <path
+        android:fillColor="#FF00E5FF"
+        android:pathData="M110,128 L210,128 L210,131 L110,131 Z" />
+</vector>
