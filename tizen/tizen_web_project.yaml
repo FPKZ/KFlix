@@ -27,7 +27,7 @@ trust_anchor: []
 
 # list of files in web project (.html,.css etc) and resources
 files:
-  - __tests__/tizen.test.js
+  - icon.png
   - css/tizen-style.css
   - index.html
   - js/tizen-main.js
@@ -38,6 +38,8 @@ files:
 
 # list of files to exclude based on the matched patterns
 excludes:
+  - __tests__/*
+  - \.tizen-rds/.*
   - Build/*
   - Debug/*
   - Directory.Build.targets

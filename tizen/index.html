@@ -4,12 +4,49 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0, user-scalable=no">
   <title>KFlix - Jellyfin Smart TV</title>
+  
+  <!-- Error Boundary Visual no topo para Smart TV Tizen (evita tela preta silenciosa) -->
+  <script>
+    window.onerror = function (msg, url, line, col, error) {
+      try {
+        var box = document.getElementById('kflix-error-overlay');
+        if (!box) {
+          box = document.createElement('div');
+          box.id = 'kflix-error-overlay';
+          box.style.position = 'fixed';
+          box.style.top = '20px';
+          box.style.left = '20px';
+          box.style.right = '20px';
+          box.style.backgroundColor = 'rgba(180, 20, 20, 0.95)';
+          box.style.color = '#ffffff';
+          box.style.padding = '24px';
+          box.style.borderRadius = '14px';
+          box.style.zIndex = '999999';
+          box.style.fontFamily = 'monospace';
+          box.style.fontSize = '18px';
+          box.style.whiteSpace = 'pre-wrap';
+          box.style.border = '2px solid #ff6b6b';
+          box.style.boxShadow = '0 10px 30px rgba(0,0,0,0.85)';
+          (document.body || document.documentElement).appendChild(box);
+        }
+        box.innerHTML = '<strong>⚠️ [KFlix Tizen Erro]</strong><br>' +
+          msg + '<br><small style="color:#ffd1d1;">Origem: ' + (url || '') + ':' + line + ':' + col + '</small>' +
+          (error && error.stack ? '<br><pre style="font-size:14px;margin-top:10px;color:#ffebeb;">' + error.stack + '</pre>' : '');
+      } catch (e) {}
+      return false;
+    };
+    window.addEventListener('unhandledrejection', function (e) {
+      var reason = e.reason ? (e.reason.stack || e.reason) : 'Promise Rejection não tratada';
+      window.onerror(reason, 'unhandledrejection', 0, 0, null);
+    });
+  </script>
+
   <link rel="stylesheet" href="shared/kflix-tv-theme.css">
   <link rel="stylesheet" href="css/tizen-style.css">
 </head>
 <body>
   <div id="app-container">
-    <!-- Iframe de Exibição do Jellyfin em Tela Cheia -->
+    <!-- Iframe de Exibição do Jellyfin em Tela Cheia (quando configurado no modo Iframe) -->
     <iframe id="kflix-view" title="Jellyfin TV Web" allow="fullscreen; autoplay"></iframe>
 
     <!-- Tela de Carregamento / Splash -->
@@ -19,20 +56,21 @@
       <div class="loader-subtitle">Conectando ao servidor Jellyfin...</div>
     </div>
 
-    <!-- Diálogo de Configuração de Servidor -->
+    <!-- Diálogo de Configurações Completo (10-foot UI) -->
     <div id="setup-dialog" class="modal-overlay hidden" aria-hidden="true" role="dialog" aria-labelledby="modal-title">
       <div class="modal-card">
         <div class="modal-header">
           <span class="app-badge">KFLIX</span>
-          <h1 id="modal-title" class="modal-title">Configurar Servidor Jellyfin</h1>
+          <h1 id="modal-title" class="modal-title">Configurações do KFlix TV</h1>
         </div>
         <p class="modal-desc">
-          Insira o endereço IP ou domínio do seu servidor Jellyfin. As configurações ficam salvas nesta Smart TV.
+          Configure o endereço do servidor Jellyfin e os parâmetros de navegação para a sua Smart TV Samsung.
         </p>
 
         <form id="setup-form" onsubmit="return false;">
+          <!-- 1. URL do Servidor -->
           <div class="form-group">
-            <label for="server-url-input" class="form-label">Endereço do Servidor (URL / IP com porta)</label>
+            <label for="server-url-input" class="form-label">Endereço do Servidor Jellyfin (URL / IP com porta)</label>
             <input type="text"
                    id="server-url-input"
                    class="form-input"
@@ -43,15 +81,42 @@
             <div id="setup-status" class="status-msg"></div>
           </div>
 
+          <!-- 2. Linha com Modo D-Pad e Modo de Inicialização -->
+          <div class="form-row">
+            <div class="form-col">
+              <label for="dpad-mode-select" class="form-label">Modo de Navegação D-Pad</label>
+              <select id="dpad-mode-select" class="form-select">
+                <option value="native">Nativo Jellyfin TV (Recomendado - 1 em 1)</option>
+                <option value="spatnav">KFlix SpatNav (Navegação customizada)</option>
+              </select>
+            </div>
+            <div class="form-col">
+              <label for="launch-mode-select" class="form-label">Modo de Exibição</label>
+              <select id="launch-mode-select" class="form-select">
+                <option value="direct">Navegação Direta (Recomendado - Sem bloqueio CORS)</option>
+                <option value="iframe">Iframe Embarcado (Dentro do KFlix)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 3. Mouse Virtual -->
+          <div class="form-group">
+            <label class="form-label">Modo Mouse Virtual</label>
+            <label class="form-check">
+              <input type="checkbox" id="virtual-mouse-toggle" />
+              <span>Habilitar cursor de mouse virtual controlado pelo D-Pad (Atalho: Clique duplo em Menu)</span>
+            </label>
+          </div>
+
           <div class="modal-actions">
-            <button type="submit" id="btn-save-server" class="btn btn-primary">Conectar</button>
+            <button type="submit" id="btn-save-server" class="btn btn-primary">Salvar e Conectar</button>
             <button type="button" id="btn-cancel-server" class="btn btn-secondary">Cancelar</button>
           </div>
         </form>
 
         <div class="remote-hint">
-          <span><span class="key-badge key-red">Vermelho</span> ou <span class="key-badge">Menu</span>: Reabrir configuração</span>
-          <span><span class="key-badge">Voltar</span>: Voltar / Sair</span>
+          <span><span class="key-badge key-red">Vermelho (A)</span> ou <span class="key-badge">Menu</span>: Reabrir configurações</span>
+          <span><span class="key-badge">Voltar</span>: Retornar / Sair</span>
         </div>
       </div>
     </div>
@@ -63,26 +128,27 @@
   <script src="js/tizen-main.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      var spatNav = new window.KFlixSpatNav({
-        document: document,
-        window: window
-      });
+      try {
+        var spatNav = window.KFlixSpatNav ? new window.KFlixSpatNav({ document: document, window: window }) : null;
+        var player = window.KFlixPlayer ? new window.KFlixPlayer({ document: document, window: window }) : null;
+        var virtualMouse = window.KFlixVirtualMouse ? new window.KFlixVirtualMouse({ document: document, window: window }) : null;
 
-      var player = new window.KFlixPlayer({
-        document: document,
-        window: window
-      });
+        var tizenApp = new window.KFlixTizen({
+          window: window,
+          document: document,
+          storage: window.localStorage,
+          player: player,
+          spatNav: spatNav,
+          virtualMouse: virtualMouse
+        });
 
-      var tizenApp = new window.KFlixTizen({
-        window: window,
-        document: document,
-        storage: window.localStorage,
-        player: player,
-        spatNav: spatNav
-      });
-
-      tizenApp.init();
-      window.kflixTizenApp = tizenApp;
+        tizenApp.init();
+        window.kflixTizenApp = tizenApp;
+      } catch (err) {
+        if (typeof window.onerror === 'function') {
+          window.onerror(err.message, 'index.html', 0, 0, err);
+        }
+      }
     });
   </script>
 </body>

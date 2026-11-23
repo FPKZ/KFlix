@@ -227,4 +227,86 @@ describe('KFlix Tizen Web Shell Tests', () => {
       assert.equal(exitCalled, false);
     });
   });
+
+  describe('Configuration Options (D-Pad, Launch Mode & Virtual Mouse)', () => {
+    it('deve salvar e carregar o modo D-Pad (padrão: native)', () => {
+      const app = new KFlixTizen({ window: mockWindow });
+      assert.equal(app.getDpadMode(), 'native');
+
+      app.saveDpadMode('spatnav');
+      assert.equal(app.getDpadMode(), 'spatnav');
+      assert.equal(mockLocalStorage.getItem('kflix_dpad_mode'), 'spatnav');
+
+      app.saveDpadMode('native');
+      assert.equal(app.getDpadMode(), 'native');
+    });
+
+    it('deve salvar e carregar o modo de inicialização (padrão: direct)', () => {
+      const app = new KFlixTizen({ window: mockWindow });
+      assert.equal(app.getLaunchMode(), 'direct');
+
+      app.saveLaunchMode('iframe');
+      assert.equal(app.getLaunchMode(), 'iframe');
+      assert.equal(mockLocalStorage.getItem('kflix_launch_mode'), 'iframe');
+
+      app.saveLaunchMode('direct');
+      assert.equal(app.getLaunchMode(), 'direct');
+    });
+
+    it('deve salvar e carregar a preferência de Mouse Virtual (padrão: false)', () => {
+      const app = new KFlixTizen({ window: mockWindow });
+      assert.equal(app.isVirtualMouseEnabled(), false);
+
+      app.saveVirtualMouseEnabled(true);
+      assert.equal(app.isVirtualMouseEnabled(), true);
+      assert.equal(mockLocalStorage.getItem('kflix_virtual_mouse'), 'true');
+
+      app.saveVirtualMouseEnabled(false);
+      assert.equal(app.isVirtualMouseEnabled(), false);
+    });
+
+    it('em modo direto, loadServer deve navegar window.location.href sem erro', () => {
+      let navigatedUrl = null;
+      const winWithLoc = {
+        ...mockWindow,
+        location: {
+          set href(val) { navigatedUrl = val; },
+          get href() { return navigatedUrl || 'file:///index.html'; }
+        }
+      };
+
+      const app = new KFlixTizen({ window: winWithLoc });
+      app.saveLaunchMode('direct');
+      app.loadServer('http://192.168.1.100:8096');
+
+      assert.equal(navigatedUrl, 'http://192.168.1.100:8096');
+    });
+  });
+
+  describe('ES Syntax Compatibility for Older Tizen Web Engines (No ?. or ??)', () => {
+    const fs = require('fs');
+    const path = require('path');
+
+    const filesToCheck = [
+      path.resolve(__dirname, '../js/tizen-main.js'),
+      path.resolve(__dirname, '../shared/kflix-virtual-mouse.js'),
+      path.resolve(__dirname, '../shared/kflix-spatnav.js'),
+      path.resolve(__dirname, '../shared/kflix-player.js')
+    ];
+
+    filesToCheck.forEach((filePath) => {
+      const baseName = path.basename(filePath);
+      it(`arquivo ${baseName} não deve conter Optional Chaining (?.)`, () => {
+        const content = fs.readFileSync(filePath, 'utf8');
+        const hasOptionalChaining = /\?\./.test(content);
+        assert.equal(hasOptionalChaining, false, `Arquivo ${baseName} contém '?.' incompatível com Tizen antigo!`);
+      });
+
+      it(`arquivo ${baseName} não deve conter Nullish Coalescing (??)`, () => {
+        const content = fs.readFileSync(filePath, 'utf8');
+        const hasNullishCoalescing = /\?\?/.test(content);
+        assert.equal(hasNullishCoalescing, false, `Arquivo ${baseName} contém '??' incompatível com Tizen antigo!`);
+      });
+    });
+  });
 });

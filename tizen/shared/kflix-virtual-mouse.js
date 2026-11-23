@@ -71,8 +71,10 @@
         this.cursorEl = this.doc.createElement('div');
         this.cursorEl.id = 'kflix-virtual-cursor';
         this.doc.body.appendChild(this.cursorEl);
-        this.x = Math.round((this.win?.innerWidth || 800) / 2);
-        this.y = Math.round((this.win?.innerHeight || 600) / 2);
+        var winW = (this.win && this.win.innerWidth) ? this.win.innerWidth : 800;
+        var winH = (this.win && this.win.innerHeight) ? this.win.innerHeight : 600;
+        this.x = Math.round(winW / 2);
+        this.y = Math.round(winH / 2);
         this.updateCursorPosition();
       }
       if (!this.toastEl) {
@@ -125,21 +127,23 @@
         this.activeKeys.add(key);
 
         const step = event.repeat ? 24 : 12;
+        var maxH = (this.win && this.win.innerHeight) ? this.win.innerHeight : 600;
+        var maxW = (this.win && this.win.innerWidth) ? this.win.innerWidth : 800;
         if (key === 'ArrowUp') this.y = Math.max(10, this.y - step);
-        if (key === 'ArrowDown') this.y = Math.min((this.win?.innerHeight || 600) - 10, this.y + step);
+        if (key === 'ArrowDown') this.y = Math.min(maxH - 10, this.y + step);
         if (key === 'ArrowLeft') this.x = Math.max(10, this.x - step);
-        if (key === 'ArrowRight') this.x = Math.min((this.win?.innerWidth || 800) - 10, this.x + step);
+        if (key === 'ArrowRight') this.x = Math.min(maxW - 10, this.x + step);
 
         this.updateCursorPosition();
 
         // Rolagem suave automática ao aproximar das bordas da tela
         const edgeThreshold = 60;
         if (this.y < edgeThreshold) {
-          if (typeof this.win?.scrollBy === 'function') {
+          if (this.win && typeof this.win.scrollBy === 'function') {
             this.win.scrollBy({ top: -50, behavior: 'smooth' });
           }
-        } else if (this.y > (this.win?.innerHeight || 600) - edgeThreshold) {
-          if (typeof this.win?.scrollBy === 'function') {
+        } else if (this.y > maxH - edgeThreshold) {
+          if (this.win && typeof this.win.scrollBy === 'function') {
             this.win.scrollBy({ top: 50, behavior: 'smooth' });
           }
         }

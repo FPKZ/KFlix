@@ -163,24 +163,68 @@ html, body {
   margin-bottom: 10px;
 }
 
-.form-input {
+.form-input,
+.form-select {
   width: 100%;
-  font-size: 22px;
-  padding: 16px 20px;
+  font-size: 20px;
+  padding: 14px 18px;
   background-color: #0d1117;
   color: #ffffff;
   border: 2px solid #30363d;
   border-radius: 12px;
   outline: none;
   transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.form-select {
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20fill%3D%22%238b949e%22%20d%3D%22M5%207l5%205%205-5z%22%2F%3E%3C%2Fsvg%3E');
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 18px;
+  padding-right: 44px;
+}
+
+.form-select option {
+  background-color: #161b22;
+  color: #f0f6fc;
+  padding: 12px;
 }
 
 .form-input:focus,
-.form-input.kflix-focused {
+.form-input.kflix-focused,
+.form-select:focus,
+.form-select.kflix-focused {
   border-color: #00a4dc;
   background-color: #121820;
   box-shadow: 0 0 16px rgba(0, 164, 220, 0.5), 0 0 0 2px #00a4dc;
   transform: scale(1.02);
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.form-col {
+  flex: 1;
+}
+
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+  cursor: pointer;
+}
+
+.form-check input[type="checkbox"] {
+  width: 26px;
+  height: 26px;
+  accent-color: #00a4dc;
+  cursor: pointer;
 }
 
 .form-input::placeholder {

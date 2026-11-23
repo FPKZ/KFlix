@@ -3,7 +3,8 @@
  * Controlador principal da aplicação KFlix para Samsung Smart TV (Tizen OS / W3C Widget).
  * 
  * Gerencia o ciclo de vida do W3C Widget, registro de teclas especiais do controle remoto Samsung,
- * persistência da URL do servidor Jellyfin, injeção de navegação espacial (KFlixSpatNav) e player.
+ * persistência das configurações do Jellyfin (URL, Modo D-Pad, Modo de Execução, Mouse Virtual),
+ * e injeção resiliente de navegação espacial (KFlixSpatNav) e KFlixPlayer.
  */
 
 (function (root, factory) {
@@ -12,13 +13,18 @@
   } else {
     root.KFlixTizen = factory();
   }
-})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+})(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this), function () {
   'use strict';
 
-  const STORAGE_KEY = 'kflix_server_url';
+  var STORAGE_KEYS = {
+    SERVER_URL: 'kflix_server_url',
+    DPAD_MODE: 'kflix_dpad_mode',
+    LAUNCH_MODE: 'kflix_launch_mode',
+    VIRTUAL_MOUSE: 'kflix_virtual_mouse'
+  };
 
   // Teclas do controle remoto Samsung Tizen
-  const TIZEN_KEYS = [
+  var TIZEN_KEYS = [
     'MediaPlayPause',
     'MediaPlay',
     'MediaPause',
@@ -31,7 +37,7 @@
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
   ];
 
-  const KEY_CODES = {
+  var KEY_CODES = {
     RETURN: 10009,
     MENU: 10133,
     COLOR_RED: 403,
@@ -47,12 +53,14 @@
   };
 
   class KFlixTizen {
-    constructor(options = {}) {
+    constructor(options) {
+      options = options || {};
       this.win = options.window || (typeof window !== 'undefined' ? window : null);
-      this.doc = options.document || (this.win?.document || null);
-      this.storage = options.storage || (this.win?.localStorage || null);
+      this.doc = options.document || (this.win && this.win.document ? this.win.document : null);
+      this.storage = options.storage || (this.win && this.win.localStorage ? this.win.localStorage : null);
       this.player = options.player || null;
       this.spatNav = options.spatNav || null;
+      this.virtualMouse = options.virtualMouse || null;
 
       // Callbacks customizáveis
       this._onOpenSetup = options.onOpenSetup || null;
@@ -72,7 +80,7 @@
      */
     sanitizeUrl(rawUrl) {
       if (!rawUrl || typeof rawUrl !== 'string') return '';
-      let url = rawUrl.trim();
+      var url = rawUrl.trim();
       if (!url) return '';
 
       // Adiciona protocolo se ausente
@@ -91,17 +99,17 @@
      */
     getServerUrl() {
       if (!this.storage) return null;
-      return this.storage.getItem(STORAGE_KEY) || null;
+      return this.storage.getItem(STORAGE_KEYS.SERVER_URL) || null;
     }
 
     /**
      * Valida, sanitiza e salva a URL no localStorage.
      */
     saveServerUrl(url) {
-      const sanitized = this.sanitizeUrl(url);
+      var sanitized = this.sanitizeUrl(url);
       if (!sanitized) return false;
       if (this.storage) {
-        this.storage.setItem(STORAGE_KEY, sanitized);
+        this.storage.setItem(STORAGE_KEYS.SERVER_URL, sanitized);
       }
       return true;
     }
@@ -111,7 +119,58 @@
      */
     clearServerUrl() {
       if (this.storage) {
-        this.storage.removeItem(STORAGE_KEY);
+        this.storage.removeItem(STORAGE_KEYS.SERVER_URL);
+      }
+    }
+
+    /**
+     * Obtém o modo D-Pad configurado ('native' | 'spatnav'). Padrão: 'native'.
+     */
+    getDpadMode() {
+      if (!this.storage) return 'native';
+      return this.storage.getItem(STORAGE_KEYS.DPAD_MODE) || 'native';
+    }
+
+    /**
+     * Salva o modo D-Pad configurado.
+     */
+    saveDpadMode(mode) {
+      if (this.storage) {
+        this.storage.setItem(STORAGE_KEYS.DPAD_MODE, mode === 'spatnav' ? 'spatnav' : 'native');
+      }
+    }
+
+    /**
+     * Obtém o modo de inicialização do Jellyfin ('direct' | 'iframe'). Padrão: 'direct'.
+     */
+    getLaunchMode() {
+      if (!this.storage) return 'direct';
+      return this.storage.getItem(STORAGE_KEYS.LAUNCH_MODE) || 'direct';
+    }
+
+    /**
+     * Salva o modo de inicialização ('direct' | 'iframe').
+     */
+    saveLaunchMode(mode) {
+      if (this.storage) {
+        this.storage.setItem(STORAGE_KEYS.LAUNCH_MODE, mode === 'iframe' ? 'iframe' : 'direct');
+      }
+    }
+
+    /**
+     * Verifica se o mouse virtual está habilitado. Padrão: false.
+     */
+    isVirtualMouseEnabled() {
+      if (!this.storage) return false;
+      return this.storage.getItem(STORAGE_KEYS.VIRTUAL_MOUSE) === 'true';
+    }
+
+    /**
+     * Salva a preferência de mouse virtual.
+     */
+    saveVirtualMouseEnabled(enabled) {
+      if (this.storage) {
+        this.storage.setItem(STORAGE_KEYS.VIRTUAL_MOUSE, enabled ? 'true' : 'false');
       }
     }
 
@@ -120,14 +179,14 @@
      * Executa com fallback seguro quando executado em navegadores normais ou em ambiente de teste.
      */
     registerTvKeys() {
-      const tizen = this.win?.tizen;
+      var tizen = this.win && this.win.tizen ? this.win.tizen : null;
       if (!tizen || !tizen.tvinputdevice || typeof tizen.tvinputdevice.registerKey !== 'function') {
         return false;
       }
 
       try {
-        for (const keyName of TIZEN_KEYS) {
-          tizen.tvinputdevice.registerKey(keyName);
+        for (var i = 0; i < TIZEN_KEYS.length; i++) {
+          tizen.tvinputdevice.registerKey(TIZEN_KEYS[i]);
         }
         return true;
       } catch (err) {
@@ -145,10 +204,10 @@
         return;
       }
 
-      const tizen = this.win?.tizen;
-      if (tizen?.application?.getCurrentApplication) {
+      var tizen = this.win && this.win.tizen ? this.win.tizen : null;
+      if (tizen && tizen.application && typeof tizen.application.getCurrentApplication === 'function') {
         try {
-          const app = tizen.application.getCurrentApplication();
+          var app = tizen.application.getCurrentApplication();
           if (app && typeof app.exit === 'function') {
             app.exit();
             return;
@@ -173,14 +232,31 @@
       }
 
       if (this.doc) {
-        const dialog = this.doc.getElementById('setup-dialog');
+        var dialog = this.doc.getElementById('setup-dialog');
         if (dialog) {
           dialog.classList.remove('hidden');
           dialog.setAttribute('aria-hidden', 'false');
-          const input = this.doc.getElementById('server-url-input');
+
+          var input = this.doc.getElementById('server-url-input');
           if (input) {
             input.value = this.getServerUrl() || '';
-            setTimeout(() => input.focus(), 50);
+            setTimeout(function () { input.focus(); }, 50);
+          }
+
+          // Preenche os selects com as opções salvas
+          var dpadSelect = this.doc.getElementById('dpad-mode-select');
+          if (dpadSelect) {
+            dpadSelect.value = this.getDpadMode();
+          }
+
+          var launchSelect = this.doc.getElementById('launch-mode-select');
+          if (launchSelect) {
+            launchSelect.value = this.getLaunchMode();
+          }
+
+          var mouseToggle = this.doc.getElementById('virtual-mouse-toggle');
+          if (mouseToggle) {
+            mouseToggle.checked = this.isVirtualMouseEnabled();
           }
         }
       }
@@ -196,7 +272,7 @@
       }
 
       if (this.doc) {
-        const dialog = this.doc.getElementById('setup-dialog');
+        var dialog = this.doc.getElementById('setup-dialog');
         if (dialog) {
           dialog.classList.add('hidden');
           dialog.setAttribute('aria-hidden', 'true');
@@ -213,7 +289,7 @@
       }
 
       if (this.doc) {
-        const dialog = this.doc.getElementById('setup-dialog');
+        var dialog = this.doc.getElementById('setup-dialog');
         if (dialog) {
           return !dialog.classList.contains('hidden') && dialog.getAttribute('aria-hidden') !== 'true';
         }
@@ -230,11 +306,11 @@
       }
 
       if (this.doc) {
-        const iframe = this.doc.getElementById('kflix-view');
+        var iframe = this.doc.getElementById('kflix-view');
         if (iframe && iframe.contentWindow) {
           try {
             return iframe.contentWindow.history.length > 1;
-          } catch {
+          } catch (e) {
             return false;
           }
         }
@@ -252,7 +328,7 @@
       }
 
       if (this.doc) {
-        const iframe = this.doc.getElementById('kflix-view');
+        var iframe = this.doc.getElementById('kflix-view');
         if (iframe && iframe.contentWindow) {
           try {
             iframe.contentWindow.history.back();
@@ -268,8 +344,8 @@
      */
     handleKeyDown(event) {
       if (!event) return false;
-      const code = event.keyCode;
-      const key = event.key;
+      var code = event.keyCode;
+      var key = event.key;
 
       // 1. Tecla Menu ou Vermelho: abre o diálogo de configuração
       if (code === KEY_CODES.MENU || key === 'Menu' || code === KEY_CODES.COLOR_RED || key === 'ColorF0Red') {
@@ -294,7 +370,7 @@
 
         // Se o diálogo de setup estiver aberto e já houver URL válida configurada, fecha o diálogo
         if (this.isSetupDialogOpen()) {
-          const currentUrl = this.getServerUrl();
+          var currentUrl = this.getServerUrl();
           if (currentUrl) {
             this.closeSetupDialog();
             return true;
@@ -304,7 +380,7 @@
           return true;
         }
 
-        // Se puder voltar o histórico do Jellyfin
+        // Se estiver em modo Iframe e puder voltar o histórico do Jellyfin
         if (this.canNavigateBack()) {
           this.navigateBack();
           return true;
@@ -329,18 +405,25 @@
       this.registerTvKeys();
 
       // Escuta global de teclas
-      if (this.win?.addEventListener) {
+      if (this.win && typeof this.win.addEventListener === 'function') {
         this.win.addEventListener('keydown', this.handleKeyDown, true);
       }
 
-      // Inicializa KFlixSpatNav se disponível
-      if (this.spatNav && typeof this.spatNav.init === 'function') {
-        this.spatNav.init();
+      // Inicializa KFlixSpatNav se disponível e habilitado
+      if (this.getDpadMode() === 'spatnav') {
+        if (this.spatNav && typeof this.spatNav.init === 'function') {
+          this.spatNav.init();
+        }
       }
 
       // Inicializa KFlixPlayer se disponível
       if (this.player && typeof this.player.init === 'function') {
         this.player.init();
+      }
+
+      // Inicializa Mouse Virtual se habilitado
+      if (this.isVirtualMouseEnabled() && this.virtualMouse && typeof this.virtualMouse.init === 'function') {
+        this.virtualMouse.init();
       }
 
       // Gerencia inicialização da interface no navegador
@@ -353,20 +436,22 @@
      * Configura ouvintes da UI (botões do setup, formulário, iframe).
      */
     setupUI() {
-      const serverUrl = this.getServerUrl();
-      const iframe = this.doc.getElementById('kflix-view');
-      const dialog = this.doc.getElementById('setup-dialog');
-      const saveBtn = this.doc.getElementById('btn-save-server');
-      const cancelBtn = this.doc.getElementById('btn-cancel-server');
-      const input = this.doc.getElementById('server-url-input');
-      const form = this.doc.getElementById('setup-form');
+      var self = this;
+      var serverUrl = this.getServerUrl();
+      var saveBtn = this.doc.getElementById('btn-save-server');
+      var cancelBtn = this.doc.getElementById('btn-cancel-server');
+      var input = this.doc.getElementById('server-url-input');
+      var form = this.doc.getElementById('setup-form');
+      var dpadSelect = this.doc.getElementById('dpad-mode-select');
+      var launchSelect = this.doc.getElementById('launch-mode-select');
+      var mouseToggle = this.doc.getElementById('virtual-mouse-toggle');
 
-      const onSave = (e) => {
+      var onSave = function (e) {
         if (e && typeof e.preventDefault === 'function') e.preventDefault();
-        const urlValue = input ? input.value : '';
-        const sanitized = this.sanitizeUrl(urlValue);
+        var urlValue = input ? input.value : '';
+        var sanitized = self.sanitizeUrl(urlValue);
         if (!sanitized) {
-          const status = this.doc.getElementById('setup-status');
+          var status = self.doc.getElementById('setup-status');
           if (status) {
             status.textContent = 'Por favor, insira uma URL válida (ex: http://192.168.1.100:8096)';
             status.className = 'status-msg error';
@@ -374,9 +459,21 @@
           return;
         }
 
-        this.saveServerUrl(sanitized);
-        this.closeSetupDialog();
-        this.loadServer(sanitized);
+        // Salvar configurações
+        self.saveServerUrl(sanitized);
+
+        if (dpadSelect) {
+          self.saveDpadMode(dpadSelect.value);
+        }
+        if (launchSelect) {
+          self.saveLaunchMode(launchSelect.value);
+        }
+        if (mouseToggle) {
+          self.saveVirtualMouseEnabled(mouseToggle.checked);
+        }
+
+        self.closeSetupDialog();
+        self.loadServer(sanitized);
       };
 
       if (form) {
@@ -386,9 +483,9 @@
         saveBtn.addEventListener('click', onSave);
       }
       if (cancelBtn) {
-        cancelBtn.addEventListener('click', () => {
-          if (this.getServerUrl()) {
-            this.closeSetupDialog();
+        cancelBtn.addEventListener('click', function () {
+          if (self.getServerUrl()) {
+            self.closeSetupDialog();
           }
         });
       }
@@ -401,38 +498,51 @@
     }
 
     /**
-     * Carrega a URL do servidor Jellyfin no iframe e injeta os utilitários de TV.
+     * Carrega a URL do servidor Jellyfin (direto ou via iframe conforme configuração).
      */
     loadServer(url) {
       if (!this.doc) return;
-      const iframe = this.doc.getElementById('kflix-view');
-      const loader = this.doc.getElementById('app-loader');
-
-      if (!iframe) return;
+      var launchMode = this.getLaunchMode();
+      var loader = this.doc.getElementById('app-loader');
 
       if (loader) {
         loader.classList.remove('hidden');
       }
 
+      // Modo 1: Navegação direta (Recomendado para Tizen - evita bloqueios de CORS/X-Frame-Options)
+      if (launchMode === 'direct') {
+        if (this.win && this.win.location) {
+          this.win.location.href = url;
+        }
+        return;
+      }
+
+      // Modo 2: Iframe embarcado
+      var iframe = this.doc.getElementById('kflix-view');
+      if (!iframe) return;
+
       iframe.src = url;
 
-      iframe.onload = () => {
+      var self = this;
+      iframe.onload = function () {
         if (loader) {
           loader.classList.add('hidden');
         }
-        this.injectEngineIntoIframe(iframe);
+        if (self.getDpadMode() === 'spatnav') {
+          self.injectEngineIntoIframe(iframe);
+        }
       };
 
-      iframe.onerror = () => {
+      iframe.onerror = function () {
         if (loader) {
           loader.classList.add('hidden');
         }
-        const status = this.doc.getElementById('setup-status');
+        var status = self.doc.getElementById('setup-status');
         if (status) {
           status.textContent = 'Não foi possível carregar o servidor Jellyfin. Verifique o endereço ou a conexão.';
           status.className = 'status-msg error';
         }
-        this.openSetupDialog();
+        self.openSetupDialog();
       };
     }
 
@@ -441,31 +551,31 @@
      */
     injectEngineIntoIframe(iframe) {
       try {
-        const frameDoc = iframe.contentDocument || iframe.contentWindow?.document;
+        var frameDoc = iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document ? iframe.contentWindow.document : null);
         if (!frameDoc) return;
 
         // Injeta CSS de tema de TV
-        const styleLink = frameDoc.createElement('link');
+        var styleLink = frameDoc.createElement('link');
         styleLink.rel = 'stylesheet';
-        styleLink.href = new URL('shared/kflix-tv-theme.css', this.win?.location?.href).href;
+        styleLink.href = 'shared/kflix-tv-theme.css';
         frameDoc.head.appendChild(styleLink);
 
         // Injeta spatnav e player
-        const spatnavScript = frameDoc.createElement('script');
-        spatnavScript.src = new URL('shared/kflix-spatnav.js', this.win?.location?.href).href;
-        spatnavScript.onload = () => {
-          const playerScript = frameDoc.createElement('script');
-          playerScript.src = new URL('shared/kflix-player.js', this.win?.location?.href).href;
-          playerScript.onload = () => {
-            if (iframe.contentWindow?.KFlixSpatNav) {
-              const subNav = new iframe.contentWindow.KFlixSpatNav({
+        var spatnavScript = frameDoc.createElement('script');
+        spatnavScript.src = 'shared/kflix-spatnav.js';
+        spatnavScript.onload = function () {
+          var playerScript = frameDoc.createElement('script');
+          playerScript.src = 'shared/kflix-player.js';
+          playerScript.onload = function () {
+            if (iframe.contentWindow && iframe.contentWindow.KFlixSpatNav) {
+              var subNav = new iframe.contentWindow.KFlixSpatNav({
                 document: frameDoc,
                 window: iframe.contentWindow
               });
               subNav.init();
             }
-            if (iframe.contentWindow?.KFlixPlayer) {
-              const subPlayer = new iframe.contentWindow.KFlixPlayer({
+            if (iframe.contentWindow && iframe.contentWindow.KFlixPlayer) {
+              var subPlayer = new iframe.contentWindow.KFlixPlayer({
                 document: frameDoc,
                 window: iframe.contentWindow
               });
@@ -475,15 +585,14 @@
           frameDoc.head.appendChild(playerScript);
         };
         frameDoc.head.appendChild(spatnavScript);
-      } catch {
-        // Bloqueio de mesma origem (CORS): comportamento padrão do navegador caso o iframe seja de outro host
-        // As teclas registradas em nível de janela (Tizen) continuam ativas para navegação e fechamento
+      } catch (e) {
+        // Bloqueio de mesma origem (CORS): comportamento padrão caso o iframe seja de outro host
       }
     }
 
     destroy() {
       if (!this._initialized) return;
-      if (this.win?.removeEventListener) {
+      if (this.win && typeof this.win.removeEventListener === 'function') {
         this.win.removeEventListener('keydown', this.handleKeyDown, true);
       }
       if (this.spatNav && typeof this.spatNav.destroy === 'function') {
@@ -492,11 +601,14 @@
       if (this.player && typeof this.player.destroy === 'function') {
         this.player.destroy();
       }
+      if (this.virtualMouse && typeof this.virtualMouse.destroy === 'function') {
+        this.virtualMouse.destroy();
+      }
       this._initialized = false;
     }
   }
 
-  KFlixTizen.STORAGE_KEY = STORAGE_KEY;
+  KFlixTizen.STORAGE_KEYS = STORAGE_KEYS;
   KFlixTizen.KEY_CODES = KEY_CODES;
   KFlixTizen.TIZEN_KEYS = TIZEN_KEYS;
 

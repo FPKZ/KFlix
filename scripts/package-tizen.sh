@@ -25,6 +25,7 @@ mkdir -p "$TIZEN_DIR/shared"
 cp -f "$PROJECT_ROOT/shared/engine/kflix-spatnav.js" "$TIZEN_DIR/shared/"
 cp -f "$PROJECT_ROOT/shared/engine/kflix-tv-theme.css" "$TIZEN_DIR/shared/"
 cp -f "$PROJECT_ROOT/shared/engine/kflix-player.js" "$TIZEN_DIR/shared/"
+cp -f "$PROJECT_ROOT/shared/engine/kflix-virtual-mouse.js" "$TIZEN_DIR/shared/"
 
 echo "==> Criando pacote W3C / Tizen (.wgt)..."
 python3 - <<EOF
@@ -34,7 +35,7 @@ import zipfile
 tizen_dir = "$TIZEN_DIR"
 output_wgt = "$OUTPUT_WGT"
 
-ignore_names = {"__tests__", ".DS_Store", "__pycache__", ".git"}
+ignore_names = {"__tests__", ".DS_Store", "__pycache__", ".git", "Debug", "Build", "Release", ".tizen-rds"}
 
 with zipfile.ZipFile(output_wgt, 'w', compression=zipfile.ZIP_DEFLATED) as zf:
     for root, dirs, files in os.walk(tizen_dir):
@@ -42,7 +43,7 @@ with zipfile.ZipFile(output_wgt, 'w', compression=zipfile.ZIP_DEFLATED) as zf:
         dirs[:] = [d for d in dirs if d not in ignore_names]
         
         for file in sorted(files):
-            if file in ignore_names or file.endswith('.test.js') or file.endswith('.swp'):
+            if file in ignore_names or file.endswith('.test.js') or file.endswith('.swp') or file.endswith('.wgt'):
                 continue
             full_path = os.path.join(root, file)
             arcname = os.path.relpath(full_path, tizen_dir)
