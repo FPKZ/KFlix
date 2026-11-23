@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0, user-scalable=no">
+  <title>KFlix - Jellyfin Smart TV</title>
+  <link rel="stylesheet" href="shared/kflix-tv-theme.css">
+  <link rel="stylesheet" href="css/tizen-style.css">
+</head>
+<body>
+  <div id="app-container">
+    <!-- Iframe de Exibição do Jellyfin em Tela Cheia -->
+    <iframe id="kflix-view" title="Jellyfin TV Web" allow="fullscreen; autoplay"></iframe>
+
+    <!-- Tela de Carregamento / Splash -->
+    <div id="app-loader" class="hidden">
+      <div class="spinner"></div>
+      <div class="loader-title">KFLIX</div>
+      <div class="loader-subtitle">Conectando ao servidor Jellyfin...</div>
+    </div>
+
+    <!-- Diálogo de Configuração de Servidor -->
+    <div id="setup-dialog" class="modal-overlay hidden" aria-hidden="true" role="dialog" aria-labelledby="modal-title">
+      <div class="modal-card">
+        <div class="modal-header">
+          <span class="app-badge">KFLIX</span>
+          <h1 id="modal-title" class="modal-title">Configurar Servidor Jellyfin</h1>
+        </div>
+        <p class="modal-desc">
+          Insira o endereço IP ou domínio do seu servidor Jellyfin. As configurações ficam salvas nesta Smart TV.
+        </p>
+
+        <form id="setup-form" onsubmit="return false;">
+          <div class="form-group">
+            <label for="server-url-input" class="form-label">Endereço do Servidor (URL / IP com porta)</label>
+            <input type="text"
+                   id="server-url-input"
+                   class="form-input"
+                   placeholder="Ex: http://192.168.1.100:8096"
+                   autocomplete="off"
+                   autocapitalize="off"
+                   spellcheck="false" />
+            <div id="setup-status" class="status-msg"></div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="submit" id="btn-save-server" class="btn btn-primary">Conectar</button>
+            <button type="button" id="btn-cancel-server" class="btn btn-secondary">Cancelar</button>
+          </div>
+        </form>
+
+        <div class="remote-hint">
+          <span><span class="key-badge key-red">Vermelho</span> ou <span class="key-badge">Menu</span>: Reabrir configuração</span>
+          <span><span class="key-badge">Voltar</span>: Voltar / Sair</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="shared/kflix-spatnav.js"></script>
+  <script src="shared/kflix-player.js"></script>
+  <script src="shared/kflix-virtual-mouse.js"></script>
+  <script src="js/tizen-main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var spatNav = new window.KFlixSpatNav({
+        document: document,
+        window: window
+      });
+
+      var player = new window.KFlixPlayer({
+        document: document,
+        window: window
+      });
+
+      var tizenApp = new window.KFlixTizen({
+        window: window,
+        document: document,
+        storage: window.localStorage,
+        player: player,
+        spatNav: spatNav
+      });
+
+      tizenApp.init();
+      window.kflixTizenApp = tizenApp;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+{
+  "projectDir": "c:\\Users\\felip\\Documents\\KFlix\\tizen",
+  "deploys": {
+    "next": [
+      {
+        "path": "Debug/projects/tizen/__tests__/tizen.test.js",
+        "type": "add"
+      },
+      {
+        "path": "Debug/projects/tizen/config.xml",
+        "type": "add"
+      },
+      {
+        "path": "Debug/projects/tizen/css/tizen-style.css",
+        "type": "add"
+      },
+      {
+        "path": "Debug/projects/tizen/index.html",
+        "type": "add"
+      },
+      {
+        "path": "Debug/projects/tizen/js/tizen-main.js",
+        "type": "add"
+      },
+      {
+        "path": "Debug/projects/tizen/shared/kflix-player.js",
+        "type": "add"
+      },
+      {
+        "path": "Debug/projects/tizen/shared/kflix-spatnav.js",
+        "type": "add"
+      },
+      {
+        "path": "Debug/projects/tizen/shared/kflix-tv-theme.css",
+        "type": "add"
+      },
+      {
+        "path": "Debug/projects/tizen/shared/kflix-virtual-mouse.js",
+        "type": "add"
+      }
+    ]
+  }
+}

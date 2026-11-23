@@ -1,0 +1,48 @@
+{
+  "projectDir": "c:\\Users\\felip\\Documents\\KFlix\\tizen",
+  "timestamp": "2026-11-23T21:13:47.988Z",
+  "hashAlgorithm": "xxh3-128",
+  "input": {
+    "config.xml": {
+      "hash": "780bff4a2b88fbdc0746011620601983"
+    },
+    "shared/kflix-player.js": {
+      "hash": "e4415eea4914b8a058f3509796c9cdc9"
+    },
+    "shared/kflix-spatnav.js": {
+      "hash": "dda5d9cc4fb4eb12b4a361fece829af0"
+    },
+    "shared/kflix-tv-theme.css": {
+      "hash": "9030946ace191569a5f1272278632afa"
+    }
+  },
+  "output": {
+    "Debug/projects/tizen/__tests__/tizen.test.js": {
+      "hash": "3213101ebfe19c153ac0319cbaa3768c"
+    },
+    "Debug/projects/tizen/config.xml": {
+      "hash": "780bff4a2b88fbdc0746011620601983"
+    },
+    "Debug/projects/tizen/css/tizen-style.css": {
+      "hash": "91a29e7d0aa56bea854f5f48d35cd810"
+    },
+    "Debug/projects/tizen/index.html": {
+      "hash": "a6b5426f7c17047646c50491a6ba9306"
+    },
+    "Debug/projects/tizen/js/tizen-main.js": {
+      "hash": "eeb4b544b0e7a6b948567ed7911dcc74"
+    },
+    "Debug/projects/tizen/shared/kflix-player.js": {
+      "hash": "e4415eea4914b8a058f3509796c9cdc9"
+    },
+    "Debug/projects/tizen/shared/kflix-spatnav.js": {
+      "hash": "dda5d9cc4fb4eb12b4a361fece829af0"
+    },
+    "Debug/projects/tizen/shared/kflix-tv-theme.css": {
+      "hash": "9030946ace191569a5f1272278632afa"
+    },
+    "Debug/projects/tizen/shared/kflix-virtual-mouse.js": {
+      "hash": "dea810e02404b860e8eb70195c42f383"
+    }
+  }
+}

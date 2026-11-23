@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget xmlns="http://www.w3.org/ns/widgets"
+        xmlns:tizen="http://tizen.org/ns/widgets"
+        id="http://kflix.tv"
+        version="1.0.0"
+        viewmodes="maximized">
+    <tizen:application id="comkflixtv.KFlix"
+                       package="comkflixtv"
+                       required_version="5.5" />
+    <content src="index.html" />
+    <feature name="http://tizen.org/feature/screen.size.all" />
+    <icon src="icon.png" />
+    <name>KFlix</name>
+    <description>KFlix - Jellyfin Smart TV Client para Samsung Tizen OS</description>
+    <author email="support@kflix.tv" href="https://github.com/kflix/kflix">KFlix Team</author>
+    <tizen:privilege name="http://tizen.org/privilege/internet" />
+    <tizen:privilege name="http://tizen.org/privilege/tv.inputdevice" />
+    <tizen:privilege name="http://tizen.org/privilege/application.launch" />
+    <tizen:profile name="tv" />
+    <tizen:setting screen-orientation="landscape"
+                   context-menu="enable"
+                   background-support="disable"
+                   encryption="disable"
+                   install-location="auto" />
+    <access origin="*" subdomains="true" />
+    <tizen:content-security-policy>default-src * 'unsafe-inline' 'unsafe-eval' data: blob: ws: wss:; media-src * data: blob: http: https:;</tizen:content-security-policy>
+</widget>
