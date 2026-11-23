@@ -32,6 +32,17 @@
         android:indeterminateTint="@color/kflix_accent"
         android:visibility="visible" />
 
+    <!-- Cursor Nativo do Mouse Virtual na TV -->
+    <ImageView
+        android:id="@+id/ivVirtualCursor"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/cursor_pointer"
+        android:visibility="gone"
+        android:elevation="120dp"
+        android:translationZ="120dp"
+        android:contentDescription="Cursor de Mouse" />
+
     <!-- Tela de Recuperação / Erro de Conexão -->
     <LinearLayout
         android:id="@+id/errorContainer"

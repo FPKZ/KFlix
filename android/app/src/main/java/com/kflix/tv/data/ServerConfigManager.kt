@@ -14,6 +14,12 @@ class ServerConfigManager(
     companion object {
         const val PREFS_NAME = "kflix_prefs"
         const val KEY_SERVER_URL = "server_url"
+        const val KEY_NAVIGATION_MODE = "navigation_mode"
+        const val KEY_VIRTUAL_MOUSE_ENABLED = "virtual_mouse_enabled"
+
+        const val NAV_MODE_NATIVE = "native"
+        const val NAV_MODE_SPATNAV = "spatnav"
+        const val NAV_MODE_MOUSE = "mouse"
 
         /**
          * Sanitiza a URL informada pelo usuário:
@@ -81,6 +87,32 @@ class ServerConfigManager(
     fun hasConfiguredServer(): Boolean {
         val url = getServerUrl()
         return !url.isNullOrBlank() && isValidUrl(url)
+    }
+
+    /**
+     * Retorna o modo de navegação configurado:
+     * - "native": Deixa o Jellyfin TV responder nativamente sem injeção de spatnav
+     * - "spatnav": Usa o motor espacial KFlix (para sites comuns/desktop)
+     * - "mouse": Modo mouse virtual
+     */
+    fun getNavigationMode(): String {
+        return preferences.getString(KEY_NAVIGATION_MODE, NAV_MODE_NATIVE) ?: NAV_MODE_NATIVE
+    }
+
+    fun setNavigationMode(mode: String) {
+        preferences.edit().putString(KEY_NAVIGATION_MODE, mode).apply()
+    }
+
+    fun isVirtualMouseEnabled(): Boolean {
+        return preferences.getBoolean(KEY_VIRTUAL_MOUSE_ENABLED, false) || getNavigationMode() == NAV_MODE_MOUSE
+    }
+
+    fun setVirtualMouseEnabled(enabled: Boolean) {
+        preferences.edit().putBoolean(KEY_VIRTUAL_MOUSE_ENABLED, enabled).apply()
+    }
+
+    fun isSpatNavEnabled(): Boolean {
+        return getNavigationMode() == NAV_MODE_SPATNAV
     }
 
     /**

@@ -22,12 +22,27 @@ class KeyEventHandlerTest {
     }
 
     @Test
-    fun `menu key triggers open server setup`() {
+    fun `menu key up triggers open server setup`() {
         val event = mock(KeyEvent::class.java)
-        val consumed = handler.handleKeyDown(KeyEvent.KEYCODE_MENU, event)
+        `when`(event.repeatCount).thenReturn(0)
+
+        handler.handleKeyDown(KeyEvent.KEYCODE_MENU, event)
+        val consumed = handler.handleKeyUp(KeyEvent.KEYCODE_MENU, event)
 
         assertTrue(consumed)
         verify(callbacks).onOpenServerSetup()
+    }
+
+    @Test
+    fun `menu key repeat triggers toggle virtual mouse`() {
+        val event = mock(KeyEvent::class.java)
+        `when`(event.repeatCount).thenReturn(1)
+
+        val consumed = handler.handleKeyDown(KeyEvent.KEYCODE_MENU, event)
+
+        assertTrue(consumed)
+        verify(callbacks).onToggleVirtualMouse()
+        verify(callbacks, never()).onOpenServerSetup()
     }
 
     @Test

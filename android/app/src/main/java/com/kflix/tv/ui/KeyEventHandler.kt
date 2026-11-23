@@ -10,6 +10,7 @@ class KeyEventHandler(
 ) {
     interface Callbacks {
         fun onOpenServerSetup()
+        fun onToggleVirtualMouse()
         fun onExitFullscreen(): Boolean
         fun onNavigateBack(): Boolean
         fun onDispatchJsKeyEvent(key: String, code: Int)
@@ -19,6 +20,8 @@ class KeyEventHandler(
     private var backKeyDownTime: Long = 0L
     private var isBackLongPress = false
 
+    private var isMenuLongPress = false
+
     companion object {
         const val LONG_PRESS_THRESHOLD_MS = 1000L
     }
@@ -26,7 +29,12 @@ class KeyEventHandler(
     fun handleKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         when (keyCode) {
             KeyEvent.KEYCODE_MENU -> {
-                callbacks.onOpenServerSetup()
+                if (event != null && event.repeatCount > 0 && !isMenuLongPress) {
+                    isMenuLongPress = true
+                    callbacks.onToggleVirtualMouse()
+                    return true
+                }
+                isMenuLongPress = false
                 return true
             }
 
@@ -71,6 +79,15 @@ class KeyEventHandler(
     }
 
     fun handleKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_MENU) {
+            if (isMenuLongPress) {
+                isMenuLongPress = false
+                return true
+            }
+            callbacks.onOpenServerSetup()
+            return true
+        }
+
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if (isBackLongPress) {
                 isBackLongPress = false

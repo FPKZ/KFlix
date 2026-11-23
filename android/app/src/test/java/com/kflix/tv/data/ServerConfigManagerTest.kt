@@ -36,6 +36,17 @@ class ServerConfigManagerTest {
             memoryStorage.remove(key)
             editor
         }
+        `when`(editor.putBoolean(anyString(), org.mockito.ArgumentMatchers.anyBoolean())).thenAnswer { invocation ->
+            val key = invocation.arguments[0] as String
+            val value = invocation.arguments[1] as Boolean
+            memoryStorage[key] = value.toString()
+            editor
+        }
+        `when`(sharedPreferences.getBoolean(anyString(), org.mockito.ArgumentMatchers.anyBoolean())).thenAnswer { invocation ->
+            val key = invocation.arguments[0] as String
+            val default = invocation.arguments[1] as Boolean
+            memoryStorage[key]?.toBoolean() ?: default
+        }
         `when`(sharedPreferences.getString(anyString(), org.mockito.ArgumentMatchers.nullable(String::class.java))).thenAnswer { invocation ->
             val key = invocation.arguments[0] as String
             val default = invocation.arguments[1] as? String
@@ -109,5 +120,26 @@ class ServerConfigManagerTest {
         serverConfigManager.clear()
         assertNull(serverConfigManager.getServerUrl())
         assertFalse(serverConfigManager.hasConfiguredServer())
+    }
+
+    @Test
+    fun `navigation mode defaults to native and can be updated`() {
+        assertEquals(ServerConfigManager.NAV_MODE_NATIVE, serverConfigManager.getNavigationMode())
+        assertFalse(serverConfigManager.isSpatNavEnabled())
+
+        serverConfigManager.setNavigationMode(ServerConfigManager.NAV_MODE_SPATNAV)
+        assertEquals(ServerConfigManager.NAV_MODE_SPATNAV, serverConfigManager.getNavigationMode())
+        assertTrue(serverConfigManager.isSpatNavEnabled())
+    }
+
+    @Test
+    fun `virtual mouse can be enabled and disabled`() {
+        assertFalse(serverConfigManager.isVirtualMouseEnabled())
+
+        serverConfigManager.setVirtualMouseEnabled(true)
+        assertTrue(serverConfigManager.isVirtualMouseEnabled())
+
+        serverConfigManager.setVirtualMouseEnabled(false)
+        assertFalse(serverConfigManager.isVirtualMouseEnabled())
     }
 }

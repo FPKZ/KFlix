@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="28dp"
+    android:height="28dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Contorno escuro para alto contraste em qualquer fundo -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M3,1 L3,20 L8.5,15.5 L12.5,23 L15.5,21.5 L11.5,14 L18,14 Z" />
+    <!-- Seta branca com ponta precisa -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M4.5,3 L4.5,17.5 L8.5,14 L12,20.5 L13.5,19.5 L10,13 L15,13 Z" />
+    <!-- Ponto de foco central azul neon Jellyfin -->
+    <path
+        android:fillColor="#00A4DC"
+        android:pathData="M6,6 L6,10 L9,9 Z" />
+</vector>

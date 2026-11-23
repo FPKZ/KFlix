@@ -384,6 +384,48 @@
         }
       }
 
+      // Se não encontrou candidato acima e pressionou ArrowUp (ex: subindo dos cards para o cabeçalho/abas/busca)
+      if (!bestCandidate && direction === 'ArrowUp') {
+        const aboveCandidates = candidates.filter(c => {
+          const r = c.getBoundingClientRect();
+          return r.bottom <= currentRect.top + 10;
+        });
+        if (aboveCandidates.length > 0) {
+          aboveCandidates.sort((a, b) => {
+            const ra = a.getBoundingClientRect();
+            const rb = b.getBoundingClientRect();
+            const dyA = Math.abs(currentCenter.y - (ra.top + ra.height / 2));
+            const dyB = Math.abs(currentCenter.y - (rb.top + rb.height / 2));
+            if (Math.abs(dyA - dyB) > 25) return dyA - dyB;
+            const dxA = Math.abs(currentCenter.x - (ra.left + ra.width / 2));
+            const dxB = Math.abs(currentCenter.x - (rb.left + rb.width / 2));
+            return dxA - dxB;
+          });
+          bestCandidate = aboveCandidates[0];
+        }
+      }
+
+      // Se não encontrou candidato abaixo e pressionou ArrowDown (ex: descendo do cabeçalho para os cards)
+      if (!bestCandidate && direction === 'ArrowDown') {
+        const belowCandidates = candidates.filter(c => {
+          const r = c.getBoundingClientRect();
+          return r.top >= currentRect.bottom - 10;
+        });
+        if (belowCandidates.length > 0) {
+          belowCandidates.sort((a, b) => {
+            const ra = a.getBoundingClientRect();
+            const rb = b.getBoundingClientRect();
+            const dyA = Math.abs((ra.top + ra.height / 2) - currentCenter.y);
+            const dyB = Math.abs((rb.top + rb.height / 2) - currentCenter.y);
+            if (Math.abs(dyA - dyB) > 25) return dyA - dyB;
+            const dxA = Math.abs(currentCenter.x - (ra.left + ra.width / 2));
+            const dxB = Math.abs(currentCenter.x - (rb.left + rb.width / 2));
+            return dxA - dxB;
+          });
+          bestCandidate = belowCandidates[0];
+        }
+      }
+
       return bestCandidate;
     }
 
